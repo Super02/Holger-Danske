@@ -1,0 +1,21 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+textrazor = "*"
+nextcord = "*"
+requests = "*"
+prisma = "*"
+matplotlib = "==3.5.0rc1"
+cogwatch = "*"
+function-cooldowns = "*"
+sentry-sdk = "*"
+mee6-py-api = "*"
+aiohttp = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.9"

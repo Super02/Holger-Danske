@@ -1,0 +1,122 @@
+generator client {
+  provider = "prisma-client-py"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model BotStorage {
+  id                        Int      @id @default(autoincrement())
+  ticket_amount             Int      @default(0)
+  last_ping                 DateTime
+  ticket_quota              Int      @default(0)
+  quota_complete_percentage Int      @default(0)
+}
+
+model TicketPurges {
+  id         Int      @id @default(autoincrement())
+  start      DateTime @default(now())
+  end        DateTime
+  multiplier Float
+  created_by String
+}
+
+model Ticket {
+  id             Int      @id @default(autoincrement())
+  reporter       String
+  reported       String
+  evidence       String
+  reason         String
+  date           DateTime @default(now())
+  staffId        Int
+  punishment     String
+  messageId      String
+  additionalInfo String?
+  completedIn    Int?
+  staff          Staff    @relation(fields: [staffId], references: [id])
+}
+
+model AgeVerification {
+  id           Int       @id @default(autoincrement())
+  date         DateTime  @default(now())
+  time_limit   DateTime?
+  messageId    String?   @unique
+  discord_id   String    @unique
+  verified     Boolean   @default(false)
+  verified_by  String?
+  requested_by String
+  redone       Int       @default(0)
+}
+
+model ReportTicket {
+  id             Int      @id @default(autoincrement())
+  reporter       String
+  reported       String
+  evidence       String
+  reason         String
+  date           DateTime @default(now())
+  messageId      String   @unique
+  additionalInfo String?
+  claimed_by     String?
+}
+
+model AppealTicket {
+  id         Int      @id @default(autoincrement())
+  discord_id String
+  reason     String
+  date       DateTime @default(now())
+  messageId  String   @unique
+  appeal     String
+  notes      String?
+  claimed_by String?
+  username   String
+}
+
+model Staff {
+  id               Int               @id @default(autoincrement())
+  discord_id       String            @unique
+  tickets          Ticket[]
+  quota_exceptions quota_exception[]
+  strikes          strikes[]
+  warning          warning[]
+}
+
+model User {
+  id               Int     @id @default(autoincrement())
+  discord_id       String  @unique
+  dm_blacklist     Boolean @default(false)
+  last_appeal      String?
+  ticket_blacklist Boolean @default(false)
+}
+
+model quota_exception {
+  id         Int      @id @default(autoincrement())
+  staffId    Int
+  start_date DateTime
+  end_date   DateTime
+  reason     String
+  approved   Boolean  @default(false)
+  staff      Staff    @relation(fields: [staffId], references: [id])
+}
+
+model strikes {
+  id         Int      @id @default(autoincrement())
+  staffId    Int
+  date       DateTime @default(now())
+  reason     String
+  moderator  String
+  message_id String   @unique
+  staff      Staff    @relation(fields: [staffId], references: [id])
+}
+
+model warning {
+  id         Int      @id @default(autoincrement())
+  staffId    Int
+  date       DateTime @default(now())
+  reason     String
+  moderator  String
+  message_id String   @unique
+  staff      Staff    @relation(fields: [staffId], references: [id])
+}
